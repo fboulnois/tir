@@ -21,7 +21,7 @@ const WCHAR* ALL_TOKEN_PRIVILEGES[MAX_PRIVILEGES] = {
 	SE_DELEGATE_SESSION_USER_IMPERSONATE_NAME,
 	SE_ENABLE_DELEGATION_NAME,
 	SE_IMPERSONATE_NAME,
-    SE_INCREASE_QUOTA_NAME,
+	SE_INCREASE_QUOTA_NAME,
 	SE_INC_BASE_PRIORITY_NAME,
 	SE_INC_WORKING_SET_NAME,
 	SE_LOAD_DRIVER_NAME,
@@ -35,7 +35,7 @@ const WCHAR* ALL_TOKEN_PRIVILEGES[MAX_PRIVILEGES] = {
 	SE_SECURITY_NAME,
 	SE_SHUTDOWN_NAME,
 	SE_SYNC_AGENT_NAME,
-    SE_SYSTEMTIME_NAME,
+	SE_SYSTEMTIME_NAME,
 	SE_SYSTEM_ENVIRONMENT_NAME,
 	SE_SYSTEM_PROFILE_NAME,
 	SE_TAKE_OWNERSHIP_NAME,
@@ -53,29 +53,29 @@ const WCHAR* ALL_TOKEN_PRIVILEGES[MAX_PRIVILEGES] = {
 } while(0)
 
 void set_token_privilege(HANDLE token, const WCHAR* name) {
-    LUID luid = { 0 };
-    if(LookupPrivilegeValue(NULL, name, &luid) == 0 && GetLastError() != ERROR_NO_SUCH_PRIVILEGE) {
+	LUID luid = { 0 };
+	if(LookupPrivilegeValue(NULL, name, &luid) == 0 && GetLastError() != ERROR_NO_SUCH_PRIVILEGE) {
 		wabort("Failed to lookup privilege value for %ls", name);
-    }
-    TOKEN_PRIVILEGES privs = {
-        .PrivilegeCount = 1,
-        .Privileges[0] = {
-            .Luid = luid,
-            .Attributes = SE_PRIVILEGE_ENABLED
-        }
-    };
-    if(AdjustTokenPrivileges(token, FALSE, &privs, 0, NULL, NULL) == 0) {
+	}
+	TOKEN_PRIVILEGES privs = {
+		.PrivilegeCount = 1,
+		.Privileges[0] = {
+			.Luid = luid,
+			.Attributes = SE_PRIVILEGE_ENABLED
+		}
+	};
+	if(AdjustTokenPrivileges(token, FALSE, &privs, 0, NULL, NULL) == 0) {
 		wabort("Failed to adjust token privileges for %ls", name);
-    }
+	}
 }
 
 void set_debug_privilege() {
-    HANDLE token = NULL;
-    ImpersonateSelf(SecurityImpersonation);
-    if(OpenThreadToken(GetCurrentThread(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, FALSE, &token) == 0) {
+	HANDLE token = NULL;
+	ImpersonateSelf(SecurityImpersonation);
+	if(OpenThreadToken(GetCurrentThread(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, FALSE, &token) == 0) {
 		wabort("Failed to open thread access token");
-    }
-    set_token_privilege(token, SE_DEBUG_NAME);
+	}
+	set_token_privilege(token, SE_DEBUG_NAME);
 }
 
 void set_all_privileges(PROCESS_INFORMATION proc) {
@@ -195,9 +195,9 @@ WCHAR* get_command_line(int argc, WCHAR* argv[]) {
 
 int wmain(int argc, WCHAR* argv[]) {
 	WCHAR* cmdline = get_command_line(argc, argv);
-    set_debug_privilege();
+	set_debug_privilege();
 	WCHAR *command = cmd_init(cmdline);
 	run_as_ti(command);
 	cmd_free(command);
-    return 0;
+	return 0;
 }
